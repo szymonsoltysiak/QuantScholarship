@@ -1,0 +1,20 @@
+[
+  {
+    "category":"FX",
+    "config":
+    [
+      {
+        "key":"EURGBP",
+        "value":"0.9"
+      },
+      {
+        "key":"USDPLN",
+        "value":"4.3"
+      },
+      {
+        "key":"USDEUR",
+        "value":"0.95"
+      }
+    ]
+  }
+]

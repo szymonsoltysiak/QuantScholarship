@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Utils.fs" />
+    <Compile Include="Money.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="Payment.fs" />
+    <Compile Include="Trades.fs" />
+    <Compile Include="Valuation.fs" />
+    <Compile Include="Chart.fs" />
+    <Compile Include="Model.fs" />
+    <Compile Include="Messages.fs" />
+    <Compile Include="Update.fs" />
+    <Compile Include="View.fs" />
+    <Compile Include="Main.fs" />
+    <Compile Include="Startup.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Bolero" Version="0.*" />
+    <PackageReference Include="Bolero.Build" Version="0.*" />
+    <PackageReference Include="Radzen.Blazor" Version="4.4.9" />
+    <PackageReference Include="FSharp.SystemTextJson" Version="1.0.*" />
+    <PackageReference Include="microsoft.aspnetcore.components.webassembly" Version="7.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.*" />
+    <PackageReference Include="System.Net.Http.Json" Version="7.0.*" />
+  </ItemGroup>
+</Project>

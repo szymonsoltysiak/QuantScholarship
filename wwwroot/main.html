@@ -1,0 +1,24 @@
+<div class="columns">
+  <aside class="column sidebar is-narrow">
+    <section class="section">
+      <nav class="menu">
+        <ul class="rz-secondary menu-list">
+          ${Menu}
+          <template id="MenuItem">
+            <li><a class="rz-ripple rz-border-radius-1 ${Active}" href="${Url}">${Text}</a></li>
+          </template>
+        </ul>
+      </nav>
+    </section>
+  </aside>
+  <div class="column">
+    <section class="section">
+      ${Body}
+
+      <div id="notification-area">
+        <div>${Error}</div>
+      </div>
+
+    </section>
+  </div>
+</div>

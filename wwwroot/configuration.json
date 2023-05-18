@@ -1,0 +1,40 @@
+[
+  {
+    "category":"monteCarlo",
+    "config":
+    [
+      {
+        "key":"runs",
+        "value":"100"
+      }
+    ]
+  },
+  {
+    "category":"valuation",
+    "config":
+    [
+      {
+        "key":"baseCurrency",
+        "value":"USD"
+      },
+      {
+        "key":"knownCurrencies",
+        "value":"USD PLN EUR GBP"
+      }
+    ]
+  },
+  {
+    "category":"methodology",
+    "config":
+    [
+      {
+        "key":"bumpRisk",
+        "value":"True"
+      },
+      {
+        "key":"bumpSize",
+        "value":"0.0001"
+      }
+    ]
+  }
+]
