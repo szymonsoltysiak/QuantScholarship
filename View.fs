@@ -66,6 +66,7 @@ let summary (model: Model) dispatch =
         |> Seq.choose (fun x ->
             match x.trade with
             | Payment p -> p.Value
+            | OptionCall p -> p.Value
             )
         |> Seq.groupBy (fun m -> m.Currency)
     let summaryRow (ccy,values : Money seq) =

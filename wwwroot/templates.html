@@ -2,11 +2,11 @@
 
     <template id="Trades">
     <div class="content">
-      <h1 class="title">Payments</h1>
       <button class="rz-button rz-secondary rz-ripple rz-border-radius-1"
               onclick="${RecalculateAll}">Recalculate All</button>
+      <h1 class="title">Payments</h1>
       <button class="rz-button rz-secondary rz-ripple rz-border-radius-1"
-              onclick="${AddPayment}">Add New</button>
+              onclick="${AddPayment}">Add New Payment</button>
       <table class="rz-grid-table">
         <tbody>
           <tr>
@@ -30,34 +30,37 @@
           </template> ${PaymentRows}
     </tbody>
     </table>
+
+    <h1 class="title">Option Call</h1>
+    <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionCall}">Add New Option Call</button>
+    <table class="rz-grid-table">
+        <tbody>
+            <tr>
+                <th></th>
+                <th style="width: 10%;">Name</th>
+                <th style="width: 10%;">Stock Price (S)</th>
+                <th style="width: 10%;">Strike Price (K)</th>
+                <th style="width: 10%;">Time to Expiry (T)</th>
+                <th style="width: 7%;">Interest Rate (r)</th>
+                <th style="width: 7%;">Volatility (sigma)</th>
+                <th style="width: 10%;">Value</th>
+            </tr>
+            <template id="OptionCallRow"></template>
+            <tr>
+                <td><button class="rz-button rz-ripple rz-border-radius-1" onclick="${Delete}">X</button></td>
+                <td><input bind-onchange="${Name}" /></td>
+                <td><input bind-onchange="${StockPrice}" /></td>
+                <td><input bind-onchange="${StrikePrice}" /></td>
+                <td><input bind-onchange="${TimeToExpiry}" /></td>
+                <td><input bind-onchange="${InterestRate}" /></td>
+                <td><input bind-onchange="${Volatility}" /></td>
+                <td>${Value}</td>
+            </tr>
+            </template> ${OptionCallRows}
+        </tbody>
+    </table>
 </div>
 </template>
-
-<template id="OptionCall">
-    <div class="content">
-      <h1 class="title">Option Call</h1>
-      <table class="rz-grid-table">
-        <tbody>
-          <tr>
-            <th>Stock Price (S)</th>
-            <th>Strike Price (K)</th>
-            <th>Time to Expiry (T)</th>
-            <th>Interest Rate (r)</th>
-            <th>Volatility (sigma)</th>
-            <th>Calculate</th>
-          </tr>
-          <tr>
-            <td><input bind-onchange="${StockPrice}" /></td>
-            <td><input bind-onchange="${StrikePrice}" /></td>
-            <td><input bind-onchange="${TimeToExpiry}" /></td>
-            <td><input bind-onchange="${InterestRate}" /></td>
-            <td><input bind-onchange="${Volatility}" /></td>
-            <td><button class="rz-button rz-primary rz-ripple rz-border-radius-1" onclick="${CalculateOptionCall}">Calculate</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </template>
 
 <template id="Summary">
     <div class="content">

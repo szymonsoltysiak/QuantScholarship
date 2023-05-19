@@ -24,6 +24,7 @@ let tradeChangeUpdate (model : Model) = function
         changeTrade model.trades id 
                 (Trades.tryMap ( function
                                 | Payment p -> Some <| Payment { p with TradeName = name}
+                                | OptionCall p -> Some <| OptionCall {p with TradeName = name}
                             )
             )
     | NewPrincipal (id,principal) ->

@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="Bolero" Version="0.*" />
     <PackageReference Include="Bolero.Build" Version="0.*" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Radzen.Blazor" Version="4.4.9" />
     <PackageReference Include="FSharp.SystemTextJson" Version="1.0.*" />
     <PackageReference Include="microsoft.aspnetcore.components.webassembly" Version="7.0.*" />

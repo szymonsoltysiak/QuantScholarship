@@ -2,6 +2,7 @@ module Payment
 open System
 open Configuration
 open Money
+open MathNet.Numerics.Distributions
 
 (* Model for Payment trade. *)
 type PaymentRecord =
@@ -62,3 +63,55 @@ type PaymentValuationModel(inputs: PaymentValuationInputs) =
         let finalCcy = if inputs.Data.ContainsKey fxRateKey then targetCcy else tradeCcy
         
         { Value = (float inputs.Trade.Principal) / fxRate; Currency = finalCcy }
+
+
+type OptionCallRecord =
+    {
+        TradeName    : string
+        StockPrice   : float
+        StrikePrice  : float
+        TimeToExpiry : float
+        InterestRate : float
+        Volatility   : float
+        Value        : Money option
+    }
+    (* Simple utility method for creating a random option call *)
+    static member sysRandom = System.Random()
+    static member Random(marketData : MarketData) =
+        let price=OptionCallRecord.sysRandom.NextDouble()*100.0
+        {
+            TradeName = sprintf "OptionCall%04d" (PaymentRecord.sysRandom.Next(9999))
+            StockPrice = price
+            StrikePrice = price*1.1
+            TimeToExpiry = OptionCallRecord.sysRandom.NextDouble()*2.0
+            Volatility = OptionCallRecord.sysRandom.NextDouble()
+            InterestRate = OptionCallRecord.sysRandom.NextDouble()
+            Value = None
+        }
+
+type OptionCallValuationInputs = 
+    {
+        Trade : OptionCallRecord
+        Data : Configuration
+        MarketData: MarketData
+    }
+
+type OptionCallValuationModel(inputs: OptionCallValuationInputs) = 
+    member this.Calculate() : Money = 
+        let gaussianCDF (x: float) =
+            Normal.CDF(0.0, 1.0, x)
+        let currency = match inputs.MarketData.TryFind "valuation::baseCurrency" with
+                         | Some ccy -> ccy
+                         | None -> "USD"
+        let S=inputs.Trade.StockPrice
+        let K=inputs.Trade.StrikePrice
+        let T=inputs.Trade.TimeToExpiry
+        let r=inputs.Trade.InterestRate
+        let sigma=inputs.Trade.Volatility
+
+
+        let d1 = (log(S / K) + (r + sigma * sigma / 2.0) * T) / (sigma * sqrt(T))
+        let d2 = d1 - sigma * sqrt(T)
+        let callPrice = S * gaussianCDF(d1) - K * exp(-r * T) * gaussianCDF(d2)
+
+        { Value = callPrice; Currency = currency}
