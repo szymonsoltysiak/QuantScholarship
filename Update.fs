@@ -35,6 +35,8 @@ let tradeChangeUpdate (model : Model) = function
                                     |> Utils.ofBool
                                     |> Option.map (fun principal ->
                                             Payment { p with Principal = principal})
+                                | OptionCall o ->
+                                    None
                             )
             )
 
@@ -46,13 +48,16 @@ let tradeChangeUpdate (model : Model) = function
                                     |> Utils.ofBool
                                     |> Option.map (fun expiry ->
                                             Payment { p with Expiry = expiry})
+                                | OptionCall o ->
+                                    None
                             )
             )
 
     | NewCurrency (id,ccy) ->
         changeTrade model.trades id 
                 (Trades.tryMap ( function
-                                | Payment p -> Some <| Payment { p with Currency = ccy}))
+                                | Payment p -> Some <| Payment { p with Currency = ccy}
+                                | OptionCall o -> None))
 
 let update (http: HttpClient) message model =
     match message with
