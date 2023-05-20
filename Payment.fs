@@ -70,7 +70,7 @@ type OptionCallRecord =
         TradeName    : string
         StockPrice   : float
         StrikePrice  : float
-        TimeToExpiry : float
+        Expiry       : DateTime
         InterestRate : float
         Volatility   : float
         Value        : Money option
@@ -78,12 +78,12 @@ type OptionCallRecord =
     (* Simple utility method for creating a random option call *)
     static member sysRandom = System.Random()
     static member Random(marketData : MarketData) =
-        let price=OptionCallRecord.sysRandom.NextDouble()*100.0
+        let price=System.Math.Round((OptionCallRecord.sysRandom.NextDouble()*100.0),2)
         {
-            TradeName = sprintf "OptionCall%04d" (PaymentRecord.sysRandom.Next(9999))
+            TradeName = sprintf "OptionCall%04d" (OptionCallRecord.sysRandom.Next(9999))
             StockPrice = price
-            StrikePrice = price*1.1
-            TimeToExpiry = OptionCallRecord.sysRandom.NextDouble()*2.0
+            StrikePrice = System.Math.Round(price*1.1,2)
+            Expiry = (DateTime.Now.AddMonths (OptionCallRecord.sysRandom.Next(1, 6))).Date
             Volatility = OptionCallRecord.sysRandom.NextDouble()
             InterestRate = OptionCallRecord.sysRandom.NextDouble()
             Value = None
@@ -105,7 +105,7 @@ type OptionCallValuationModel(inputs: OptionCallValuationInputs) =
                          | None -> "USD"
         let S=inputs.Trade.StockPrice
         let K=inputs.Trade.StrikePrice
-        let T=inputs.Trade.TimeToExpiry
+        let T=inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays/365.
         let r=inputs.Trade.InterestRate
         let sigma=inputs.Trade.Volatility
 

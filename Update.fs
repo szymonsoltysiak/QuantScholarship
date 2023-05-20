@@ -48,8 +48,11 @@ let tradeChangeUpdate (model : Model) = function
                                     |> Utils.ofBool
                                     |> Option.map (fun expiry ->
                                             Payment { p with Expiry = expiry})
-                                | OptionCall o ->
-                                    None
+                                | OptionCall p ->
+                                    DateTime.TryParse(expiry)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun expiry ->
+                                            OptionCall { p with Expiry = expiry})
                             )
             )
 
@@ -58,6 +61,48 @@ let tradeChangeUpdate (model : Model) = function
                 (Trades.tryMap ( function
                                 | Payment p -> Some <| Payment { p with Currency = ccy}
                                 | OptionCall o -> None))
+    
+    | NewStockPrice (id,price) ->
+        changeTrade model.trades id
+                (Trades.tryMap ( function
+                                | OptionCall p -> 
+                                    Single.TryParse(price)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun price ->
+                                            OptionCall { p with StockPrice = float price})
+                                | Payment p -> None
+                                )            
+                )
+
+    | NewStrikePrice (id, price) ->
+        changeTrade model.trades id
+                 (Trades.tryMap ( function
+                                | OptionCall p -> 
+                                    Single.TryParse(price)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun price ->
+                                            OptionCall { p with StrikePrice = float price})
+                                | Payment p -> None))
+
+    | NewIntrestRate (id, rate) ->
+        changeTrade model.trades id
+                (Trades.tryMap ( function
+                                | OptionCall p ->
+                                    Single.TryParse(rate)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun rate ->
+                                            OptionCall { p with InterestRate = float rate})
+                                | Payment p -> None))
+                                
+    | NewVolatility (id, vol) ->
+        changeTrade model.trades id
+                (Trades.tryMap ( function
+                                | OptionCall p -> 
+                                    Single.TryParse(vol)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun vol ->
+                                            OptionCall { p with Volatility = float vol})
+                                | Payment p -> None))
 
 let update (http: HttpClient) message model =
     match message with
@@ -67,6 +112,10 @@ let update (http: HttpClient) message model =
         let newPayment = Trades.wrap (Payment <| PaymentRecord.Random(model.configuration))
         let newTrades = Map.add newPayment.id newPayment model.trades
         { model with trades = newTrades }, Cmd.none
+    | AddOptionCall ->
+        let newOptionCall = Trades.wrap (OptionCall <| OptionCallRecord.Random(model.configuration))
+        let newTrades = Map.add newOptionCall.id newOptionCall model.trades
+        { model with trades = newTrades}, Cmd.none
     | RemoveTrade(tradeId) ->
         let newTrades = Map.remove tradeId model.trades
         { model with trades = newTrades }, Cmd.none

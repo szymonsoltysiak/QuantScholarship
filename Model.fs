@@ -65,3 +65,9 @@ module Trades =
                                   | Payment p -> Some <| (t.id,p)
                                   | _ -> None //this line will be needed when there's more trade types
                         )
+
+  let onlyCalls (trades : Map<_,UITrade>) =
+      trades |> choose (fun t -> match t.trade with 
+                                  | OptionCall p -> Some <| (t.id,p)
+                                  | _ -> None //this line will be needed when there's more trade types
+                        )   

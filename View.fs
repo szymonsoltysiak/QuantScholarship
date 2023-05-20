@@ -91,14 +91,31 @@ let paymentRow dispatch (tradeId, p : PaymentRecord) =
         .Delete(fun e -> dispatch (RemoveTrade tradeId))
         .Elt()
 
+let optionCallRow dispatch (tradeId, p : OptionCallRecord) =
+    let value = p.Value |> Option.map (string) |> Option.defaultValue "" 
+    let tradeChange msg s = dispatch <| TradeChange (msg (tradeId,s))
+    Templates.OptionCallRow()
+        .Name(p.TradeName,tradeChange NewName)
+        .StockPrice(sprintf "%A" p.StockPrice, tradeChange NewStockPrice)
+        .StrikePrice(sprintf "%A" p.StrikePrice, tradeChange NewStrikePrice)
+        .Expiry(sprintf "%A" p.Expiry, tradeChange NewExpiry)
+        .InterestRate(sprintf "%A" p.InterestRate, tradeChange NewIntrestRate)
+        .Volatility(sprintf "%A" p.Volatility, tradeChange NewVolatility)
+        .Value(value)
+        .Delete(fun e -> dispatch (RemoveTrade tradeId))
+        .Elt()
+
 let homePage (model: Model) dispatch =
 
     let payments = onlyPayments model.trades
+    let calls = onlyCalls model.trades
     let trades = 
         Templates.Trades()
             .AddPayment(fun _ -> dispatch AddPayment)
+            .AddOptionCall(fun _ -> dispatch AddOptionCall)
             .RecalculateAll(fun _ -> dispatch RecalculateAll)
             .PaymentRows(forEach payments (paymentRow dispatch))
+            .OptionCallRows(forEach calls (optionCallRow dispatch))
             .Elt()
 
     Templates.Home()

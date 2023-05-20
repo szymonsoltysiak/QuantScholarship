@@ -37,21 +37,22 @@
         <tbody>
             <tr>
                 <th></th>
-                <th style="width: 10%;">Name</th>
-                <th style="width: 10%;">Stock Price (S)</th>
-                <th style="width: 10%;">Strike Price (K)</th>
-                <th style="width: 10%;">Time to Expiry (T)</th>
-                <th style="width: 7%;">Interest Rate (r)</th>
-                <th style="width: 7%;">Volatility (sigma)</th>
-                <th style="width: 10%;">Value</th>
+                <th style="width: 15%;">Name</th>
+                <th style="width: 15%;">Stock Price</th>
+                <th style="width: 10%;">Strike Price</th>
+                <th style="width: 10%;">Expiry</th>
+                <th style="width: 7%;">Interest Rate</th>
+                <th style="width: 7%;">Volatility</th>
+                <th style="width: 15%;">Value</th>
             </tr>
-            <template id="OptionCallRow"></template>
+            <template id="OptionCallRow">
             <tr>
-                <td><button class="rz-button rz-ripple rz-border-radius-1" onclick="${Delete}">X</button></td>
+                <td><button class="rz-button rz-ripple rz-border-radius-1" 
+                            onclick="${Delete}">X</button></td>
                 <td><input bind-onchange="${Name}" /></td>
                 <td><input bind-onchange="${StockPrice}" /></td>
                 <td><input bind-onchange="${StrikePrice}" /></td>
-                <td><input bind-onchange="${TimeToExpiry}" /></td>
+                <td><input bind-onchange="${Expiry}" /></td>
                 <td><input bind-onchange="${InterestRate}" /></td>
                 <td><input bind-onchange="${Volatility}" /></td>
                 <td>${Value}</td>
