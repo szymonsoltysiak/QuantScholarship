@@ -11,6 +11,7 @@ open System.Net.Http.Json
 open Trades
 open Valuation
 
+
 let changeTrade (trades : Map<TradeID,UITrade>) id f =
         match Map.tryFind id trades with
         | Some t -> 
@@ -66,10 +67,10 @@ let tradeChangeUpdate (model : Model) = function
         changeTrade model.trades id
                 (Trades.tryMap ( function
                                 | OptionCall p -> 
-                                    Single.TryParse(price)
+                                    Utils.tryParseCustomFormat(price)
                                     |> Utils.ofBool
                                     |> Option.map (fun price ->
-                                            OptionCall { p with StockPrice = float price})
+                                            OptionCall { p with StockPrice = price})
                                 | Payment p -> None
                                 )            
                 )
@@ -78,30 +79,30 @@ let tradeChangeUpdate (model : Model) = function
         changeTrade model.trades id
                  (Trades.tryMap ( function
                                 | OptionCall p -> 
-                                    Single.TryParse(price)
+                                    Utils.tryParseCustomFormat(price)
                                     |> Utils.ofBool
                                     |> Option.map (fun price ->
-                                            OptionCall { p with StrikePrice = float price})
+                                            OptionCall { p with StrikePrice = price})
                                 | Payment p -> None))
 
     | NewIntrestRate (id, rate) ->
         changeTrade model.trades id
                 (Trades.tryMap ( function
                                 | OptionCall p ->
-                                    Single.TryParse(rate)
+                                    Utils.tryParseCustomFormat(rate)
                                     |> Utils.ofBool
                                     |> Option.map (fun rate ->
-                                            OptionCall { p with InterestRate = float rate})
+                                            OptionCall { p with InterestRate = rate})
                                 | Payment p -> None))
                                 
     | NewVolatility (id, vol) ->
         changeTrade model.trades id
                 (Trades.tryMap ( function
                                 | OptionCall p -> 
-                                    Single.TryParse(vol)
+                                    Utils.tryParseCustomFormat(vol)
                                     |> Utils.ofBool
                                     |> Option.map (fun vol ->
-                                            OptionCall { p with Volatility = float vol})
+                                            OptionCall { p with Volatility = vol})
                                 | Payment p -> None))
 
 let update (http: HttpClient) message model =
