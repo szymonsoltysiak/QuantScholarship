@@ -16,6 +16,7 @@ type UITrade =
           match this.trade with
           | Payment p -> p.TradeName
           | OptionCall p -> p.TradeName
+          | OptionCallMonteCarlo p -> p.TradeName
 
 /// Routing endpoints definition.
 type Page =
@@ -71,3 +72,9 @@ module Trades =
                                   | OptionCall p -> Some <| (t.id,p)
                                   | _ -> None //this line will be needed when there's more trade types
                         )   
+
+  let onlyCallsMonteCarlo (trades : Map<_,UITrade>) =
+      trades |> choose (fun t -> match t.trade with 
+                                  | OptionCallMonteCarlo p -> Some <| (t.id,p)
+                                  | _ -> None //this line will be needed when there's more trade types
+                        )    

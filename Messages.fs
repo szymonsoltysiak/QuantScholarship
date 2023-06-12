@@ -22,6 +22,7 @@ type Message =
     | SetPage of Page
     | AddPayment
     | AddOptionCall
+    | AddOptionCallMonte
     | RemoveTrade of TradeID
     | TradeChange of TradeChangeMsg
     | RecalculateAll

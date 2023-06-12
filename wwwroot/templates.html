@@ -37,13 +37,13 @@
         <tbody>
             <tr>
                 <th></th>
-                <th style="width: 15%;">Name</th>
-                <th style="width: 15%;">Stock Price</th>
-                <th style="width: 10%;">Strike Price</th>
-                <th style="width: 10%;">Expiry</th>
-                <th style="width: 7%;">Interest Rate</th>
-                <th style="width: 7%;">Volatility</th>
-                <th style="width: 15%;">Value</th>
+                <th style="width: 16%;">Name</th>
+                <th style="width: 16%;">Stock Price</th>
+                <th style="width: 12%;">Strike Price</th>
+                <th style="width: 12%;">Expiry</th>
+                <th style="width: 9%;">Interest Rate</th>
+                <th style="width: 9%;">Volatility</th>
+                <th style="width: 19%;">Value</th>
             </tr>
             <template id="OptionCallRow">
             <tr>
@@ -58,6 +58,36 @@
                 <td>${Value}</td>
             </tr>
             </template> ${OptionCallRows}
+        </tbody>
+    </table>
+
+    <h1 class="title">Option Call Monte Carlo</h1>
+    <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionCallMonte}">Add New Option Call</button>
+    <table class="rz-grid-table">
+        <tbody>
+            <tr>
+                <th></th>
+                <th style="width: 16%;">Name</th>
+                <th style="width: 16%;">Stock Price</th>
+                <th style="width: 12%;">Strike Price</th>
+                <th style="width: 12%;">Expiry</th>
+                <th style="width: 9%;">Interest Rate</th>
+                <th style="width: 9%;">Volatility</th>
+                <th style="width: 19%;">Value</th>
+            </tr>
+            <template id="OptionCallMonteCarloRow">
+            <tr>
+                <td><button class="rz-button rz-ripple rz-border-radius-1" 
+                            onclick="${Delete}">X</button></td>
+                <td><input bind-onchange="${Name}" /></td>
+                <td><input bind-onchange="${StockPrice}" /></td>
+                <td><input bind-onchange="${StrikePrice}" /></td>
+                <td><input bind-onchange="${Expiry}" /></td>
+                <td><input bind-onchange="${InterestRate}" /></td>
+                <td><input bind-onchange="${Volatility}" /></td>
+                <td>${Value}</td>
+            </tr>
+            </template> ${OptionCallMonteCarloRows}
         </tbody>
     </table>
 </div>
