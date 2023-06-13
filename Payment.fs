@@ -160,7 +160,7 @@ type OptionCallValuationModelMonteCarlo(inputs: OptionCallMonteCarloValuationInp
         let drift = inputs.Trade.InterestRate
         let vol = inputs.Trade.Volatility
 
-        let steps = 100  
+        let steps = 365  
         let N = 
             match inputs.MarketData.TryFind "monteCarlo::runs" with
             | Some runs -> int runs
