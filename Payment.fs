@@ -127,7 +127,6 @@ type OptionCallMonteCarloRecord =
         Volatility   : float
         Value        : Money option
     }
-    (* Simple utility method for creating a random option call *)
     static member sysRandom = System.Random()
     static member Random(marketData : MarketData) =
         let price=System.Math.Round((OptionCallRecord.sysRandom.NextDouble()*100.0),2)
@@ -149,37 +148,47 @@ type OptionCallMonteCarloValuationInputs =
     }
 
 type OptionCallValuationModelMonteCarlo(inputs: OptionCallMonteCarloValuationInputs) = 
-    member this.Calculate() : Money = 
-        let currency = match inputs.MarketData.TryFind "valuation::baseCurrency" with
-                         | Some ccy -> ccy
-                         | None -> "USD"        
-        let S=inputs.Trade.StockPrice
-        let K=inputs.Trade.StrikePrice
-        let T=inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays/365.
-        let r=inputs.Trade.InterestRate
-        let sigma=inputs.Trade.Volatility
+    member this.Calculate() : Money =  
+        let currency =
+            match inputs.MarketData.TryFind "valuation::baseCurrency" with
+            | Some ccy -> ccy
+            | None -> "USD"
 
-        let calculateCallOptionValueMonteCarlo () =
-            let random = Random()
-            let numSimulations=100
-            let mutable stockPrice=S
-            let expiry=inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays
-            
-            let rec simulate (simulation: int) (accumulatedPayoff: float) =
-                if simulation >= numSimulations then
-                    accumulatedPayoff / float numSimulations
+        let S = inputs.Trade.StockPrice
+        let K = inputs.Trade.StrikePrice
+        let years = inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays / 365.0
+        let drift = inputs.Trade.InterestRate
+        let vol = inputs.Trade.Volatility
+
+        let steps = 100  
+        let N = 
+            match inputs.MarketData.TryFind "monteCarlo::runs" with
+            | Some runs -> int runs
+            | None -> 100
+        let rand = Normal.Sample(0.0, 1.0)
+
+        let generatePath () =
+            let dt = years / float steps
+            let rec loop t s vs =
+                if t >= years then s, vs
                 else
-                    let pricePath = Seq.init (int expiry) (fun _ ->
-                        let priceChange = stockPrice * (r * expiry + sigma * sqrt expiry * Normal.Sample(0.0, 1.0))
-                        stockPrice <- stockPrice + priceChange
-                        stockPrice)
+                    let z1 = Normal.Sample(0.0, 1.0)
+                    let s' = s * exp((drift - vol ** 2.0 / 2.0) * dt + vol * sqrt(dt) * z1)
+                    let vs' = vs + (s' / s - 1.0) ** 2.0 / dt
+                    loop (t + dt) s' vs'
+            loop 0.0 S 0.0
+            
+        let paths = List.init N (fun _ -> generatePath())
+        let prices = paths |> List.map (fun (s, _) -> s)
+        let averagePrice = List.average prices
 
-                    let finalPrice = Seq.last pricePath
-                    let payoff = max (finalPrice - K) 0.0
-                    simulate (simulation + 1) (accumulatedPayoff + payoff)
+        // Calculate option value based on average price
+        let optionValue = max (averagePrice - K) 0.0
 
-            simulate 0 0.0
-        
-        { Value = calculateCallOptionValueMonteCarlo(); Currency = currency}
+        { Value = optionValue; Currency = currency}    
+
+
+
+
 
 
