@@ -174,7 +174,7 @@ type OptionCallValuationModelMonteCarlo(inputs: OptionCallMonteCarloValuationInp
                 else
                     let z1 = Normal.Sample(0.0, 1.0)
                     let s' = s * exp((drift - vol ** 2.0 / 2.0) * dt + vol * sqrt(dt) * z1)
-                    let vs' = vs + (s' / s - 1.0) ** 2.0 / dt
+                    let vs' = vs + (s' / s - 1.0) ** 2.0 / dt //let vs' = vs + ((s' / s) - 1.0) ** 2.0 * dt
                     loop (t + dt) s' vs'
             loop 0.0 S 0.0
             
