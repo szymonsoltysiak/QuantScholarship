@@ -20,8 +20,8 @@ let valuateTrade config marketData (trade : Trade) : Trade =
         MarketData = marketData
       }
     let vm = OptionCallValuationModel(inputs)
-    OptionCall { o with  Delta = Some <| vm.CalculateDelta()
-                         Value = Some <| vm.Calculate()}
+    OptionCall { o with Value = Some <| vm.Calculate()
+                        Delta = Some <| vm.CalculateDelta()}
 
   | OptionCallMonteCarlo o ->
     let inputs: OptionCallMonteCarloValuationInputs = 
@@ -31,6 +31,25 @@ let valuateTrade config marketData (trade : Trade) : Trade =
       }
     let vm = OptionCallValuationModelMonteCarlo(inputs)
     OptionCallMonteCarlo { o with Value = Some <| vm.Calculate()}
+
+  | OptionPut o ->
+    let inputs: OptionPutValuationInputs = 
+      { Trade = o
+        Data = config
+        MarketData = marketData
+      }
+    let vm = OptionPutValuationModel(inputs)
+    OptionPut { o with Value = Some <| vm.Calculate()
+                       Delta = Some <| vm.CalculateDelta()}
+
+  | OptionPutMonteCarlo o ->
+    let inputs: OptionPutMonteCarloValuationInputs = 
+      { Trade = o
+        Data = config
+        MarketData = marketData
+      }
+    let vm = OptionPutValuationModelMonteCarlo(inputs)
+    OptionPutMonteCarlo { o with Value = Some <| vm.Calculate()}
 
 
 

@@ -190,7 +190,7 @@ type OptionCallValuationModelMonteCarlo(inputs: OptionCallMonteCarloValuationInp
                 else
                     let z1 = Normal.Sample(0.0, 1.0)
                     let s' = s * exp((drift - vol ** 2.0 / 2.0) * dt + vol * sqrt(dt) * z1)
-                    let vs' = vs + (s' / s - 1.0) ** 2.0 / dt //let vs' = vs + ((s' / s) - 1.0) ** 2.0 * dt
+                    let vs' = vs + (s' / s - 1.0) ** 2.0 / dt 
                     loop (t + dt) s' vs'
             loop 0.0 S 0.0
             
@@ -198,10 +198,146 @@ type OptionCallValuationModelMonteCarlo(inputs: OptionCallMonteCarloValuationInp
         let prices = paths |> List.map (fun (s, _) -> s)
         let averagePrice = List.average prices
 
-        // Calculate option value based on average price
         let optionValue = max (averagePrice - K) 0.0
 
         { Value = optionValue; Currency = currency}    
+
+type OptionPutRecord =
+    {
+        TradeName    : string
+        StockPrice   : float
+        StrikePrice  : float
+        Expiry       : DateTime
+        InterestRate : float
+        Volatility   : float
+        Value        : Money option
+        Delta        : float option
+    }
+    static member sysRandom = System.Random()
+    static member Random(marketData : MarketData) =
+        let price=System.Math.Round((OptionPutRecord.sysRandom.NextDouble()*100.0),2)
+        {
+            TradeName = sprintf "OptionPut%04d" (OptionPutRecord.sysRandom.Next(9999))
+            StockPrice = price
+            StrikePrice = System.Math.Round(price*0.9,2)
+            Expiry = (DateTime.Now.AddMonths (OptionPutRecord.sysRandom.Next(1, 6))).Date
+            Volatility = System.Math.Round(OptionPutRecord.sysRandom.NextDouble(),6)
+            InterestRate = System.Math.Round(OptionPutRecord.sysRandom.NextDouble(),6)
+            Value = None
+            Delta = None
+        }
+
+type OptionPutValuationInputs = 
+    {
+        Trade : OptionPutRecord
+        Data : Configuration
+        MarketData: MarketData
+    }
+
+type OptionPutValuationModel(inputs: OptionPutValuationInputs) = 
+    member this.Calculate() : Money = 
+        let currency = match inputs.MarketData.TryFind "valuation::baseCurrency" with
+                         | Some ccy -> ccy
+                         | None -> "USD"
+        let gaussianCDF (x: float) =
+            Normal.CDF(0.0, 1.0, x)
+        
+        let S=inputs.Trade.StockPrice
+        let K=inputs.Trade.StrikePrice
+        let T=inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays/365.
+        let r=inputs.Trade.InterestRate
+        let sigma=inputs.Trade.Volatility
+
+
+        let d1 = (log(S / K) + (r + sigma * sigma / 2.0) * T) / (sigma * sqrt(T))
+        let d2 = d1 - sigma * sqrt(T)
+        let callPrice = K * exp(-r * T) * gaussianCDF(-d2) - S * gaussianCDF(-d1)  
+
+        { Value = callPrice; Currency = currency}
+
+    member this.CalculateDelta(): float =
+        let S=inputs.Trade.StockPrice
+        let K=inputs.Trade.StrikePrice
+        let T=inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays/365.
+        let r=inputs.Trade.InterestRate
+        let sigma=inputs.Trade.Volatility
+        let gaussianCDF (x: float) =
+            Normal.CDF(0.0, 1.0, x)
+
+        let d1 = (log(S / K) + (r + sigma * sigma / 2.0) * T) / (sigma * sqrt(T))
+        let Delta = -gaussianCDF(-d1)
+        Delta
+
+
+type OptionPutMonteCarloRecord =
+    {
+        TradeName    : string
+        StockPrice   : float
+        StrikePrice  : float
+        Expiry       : DateTime
+        InterestRate : float
+        Volatility   : float
+        Value        : Money option
+    }
+    static member sysRandom = System.Random()
+    static member Random(marketData : MarketData) =
+        let price=System.Math.Round((OptionPutRecord.sysRandom.NextDouble()*100.0),2)
+        {
+            TradeName = sprintf "OptionPut%04d" (OptionPutRecord.sysRandom.Next(9999))
+            StockPrice = price
+            StrikePrice = System.Math.Round(price*0.9,2)
+            Expiry = (DateTime.Now.AddMonths (OptionPutRecord.sysRandom.Next(1, 6))).Date
+            Volatility = System.Math.Round(OptionPutRecord.sysRandom.NextDouble(),6)
+            InterestRate = System.Math.Round(OptionPutRecord.sysRandom.NextDouble(),6)
+            Value = None
+        }
+
+type OptionPutMonteCarloValuationInputs = 
+    {
+        Trade : OptionPutMonteCarloRecord
+        Data : Configuration
+        MarketData: MarketData
+    }
+
+type OptionPutValuationModelMonteCarlo(inputs: OptionPutMonteCarloValuationInputs) = 
+    member this.Calculate() : Money =  
+        let currency =
+            match inputs.MarketData.TryFind "valuation::baseCurrency" with
+            | Some ccy -> ccy
+            | None -> "USD"
+
+        let S = inputs.Trade.StockPrice
+        let K = inputs.Trade.StrikePrice
+        let years = inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays / 365.0
+        let drift = inputs.Trade.InterestRate
+        let vol = inputs.Trade.Volatility
+
+        let steps = 365  
+        let N = 
+            match inputs.MarketData.TryFind "monteCarlo::runs" with
+            | Some runs -> int runs
+            | None -> 100
+        let rand = Normal.Sample(0.0, 1.0)
+
+        let generatePath () =
+            let dt = years / float steps
+            let rec loop t s vs =
+                if t >= years then s, vs
+                else
+                    let z1 = Normal.Sample(0.0, 1.0)
+                    let s' = s * exp((drift - vol ** 2.0 / 2.0) * dt + vol * sqrt(dt) * z1)
+                    let vs' = vs + (s' / s - 1.0) ** 2.0 / dt 
+                    loop (t + dt) s' vs'
+            loop 0.0 S 0.0
+            
+        let paths = List.init N (fun _ -> generatePath())
+        let prices = paths |> List.map (fun (s, _) -> s)
+        let averagePrice = List.average prices
+
+        let optionValue = max (K - averagePrice) 0.0
+
+        { Value = optionValue; Currency = currency}    
+
 
 
 

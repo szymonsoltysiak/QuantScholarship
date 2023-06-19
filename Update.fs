@@ -27,6 +27,8 @@ let tradeChangeUpdate (model : Model) = function
                                 | Payment p -> Some <| Payment { p with TradeName = name}
                                 | OptionCall p -> Some <| OptionCall {p with TradeName = name}
                                 | OptionCallMonteCarlo p -> Some <| OptionCallMonteCarlo {p with TradeName = name}
+                                | OptionPut p -> Some <| OptionPut {p with TradeName = name}
+                                | OptionPutMonteCarlo p -> Some <| OptionPutMonteCarlo {p with TradeName = name}                                
                             )
             )
 
@@ -38,10 +40,8 @@ let tradeChangeUpdate (model : Model) = function
                                     |> Utils.ofBool
                                     |> Option.map (fun principal ->
                                             Payment { p with Principal = principal})
-                                | OptionCall o ->
-                                    None
-                                | OptionCallMonteCarlo o ->
-                                    None
+                                | _  ->
+                                    None                                
                             )
             )
 
@@ -63,6 +63,16 @@ let tradeChangeUpdate (model : Model) = function
                                     |> Utils.ofBool
                                     |> Option.map (fun expiry ->
                                             OptionCallMonteCarlo { p with Expiry = expiry})
+                                | OptionPut p ->
+                                    DateTime.TryParse(expiry)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun expiry ->
+                                            OptionPut { p with Expiry = expiry})
+                                | OptionPutMonteCarlo p ->
+                                    DateTime.TryParse(expiry)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun expiry ->
+                                            OptionPutMonteCarlo { p with Expiry = expiry})                                            
                             )
             )
 
@@ -70,8 +80,7 @@ let tradeChangeUpdate (model : Model) = function
         changeTrade model.trades id 
                 (Trades.tryMap ( function
                                 | Payment p -> Some <| Payment { p with Currency = ccy}
-                                | OptionCall o -> None
-                                | OptionCallMonteCarlo o -> None))
+                                | _ -> None))
     
     | NewStockPrice (id,price) ->
         changeTrade model.trades id
@@ -85,7 +94,17 @@ let tradeChangeUpdate (model : Model) = function
                                     Utils.tryParseCustomFormat(price)
                                     |> Utils.ofBool
                                     |> Option.map (fun price ->
-                                            OptionCallMonteCarlo { p with StockPrice = price})                                            
+                                            OptionCallMonteCarlo { p with StockPrice = price})
+                                | OptionPut p -> 
+                                    Utils.tryParseCustomFormat(price)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun price ->
+                                            OptionPut { p with StockPrice = price})
+                                | OptionPutMonteCarlo p -> 
+                                    Utils.tryParseCustomFormat(price)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun price ->
+                                            OptionPutMonteCarlo { p with StockPrice = price})                                                                                         
                                 | Payment p -> None
                                 )            
                 )
@@ -102,7 +121,17 @@ let tradeChangeUpdate (model : Model) = function
                                     Utils.tryParseCustomFormat(price)
                                     |> Utils.ofBool
                                     |> Option.map (fun price ->
-                                            OptionCallMonteCarlo { p with StrikePrice = price})                                            
+                                            OptionCallMonteCarlo { p with StrikePrice = price})  
+                                | OptionPut p -> 
+                                    Utils.tryParseCustomFormat(price)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun price ->
+                                            OptionPut { p with StrikePrice = price})
+                                | OptionPutMonteCarlo p -> 
+                                    Utils.tryParseCustomFormat(price)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun price ->
+                                            OptionPutMonteCarlo { p with StrikePrice = price})                                                                                      
                                 | Payment p -> None))
 
     | NewIntrestRate (id, rate) ->
@@ -117,7 +146,17 @@ let tradeChangeUpdate (model : Model) = function
                                     Utils.tryParseCustomFormat(rate)
                                     |> Utils.ofBool
                                     |> Option.map (fun rate ->
-                                            OptionCallMonteCarlo { p with InterestRate = rate})                                            
+                                            OptionCallMonteCarlo { p with InterestRate = rate})   
+                                | OptionPut p ->
+                                    Utils.tryParseCustomFormat(rate)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun rate ->
+                                            OptionPut { p with InterestRate = rate})
+                                | OptionPutMonteCarlo p ->
+                                    Utils.tryParseCustomFormat(rate)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun rate ->
+                                            OptionPutMonteCarlo { p with InterestRate = rate})                                                                                      
                                 | Payment p -> None))
                                 
     | NewVolatility (id, vol) ->
@@ -132,7 +171,17 @@ let tradeChangeUpdate (model : Model) = function
                                     Utils.tryParseCustomFormat(vol)
                                     |> Utils.ofBool
                                     |> Option.map (fun vol ->
-                                            OptionCallMonteCarlo { p with Volatility = vol})                                            
+                                            OptionCallMonteCarlo { p with Volatility = vol}) 
+                                | OptionPut p -> 
+                                    Utils.tryParseCustomFormat(vol)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun vol ->
+                                            OptionPut { p with Volatility = vol})
+                                | OptionPutMonteCarlo p -> 
+                                    Utils.tryParseCustomFormat(vol)
+                                    |> Utils.ofBool
+                                    |> Option.map (fun vol ->
+                                            OptionPutMonteCarlo { p with Volatility = vol})                                                                                         
                                 | Payment p -> None))
 
 
@@ -151,6 +200,14 @@ let update (http: HttpClient) message model =
     | AddOptionCallMonte ->
         let newOptionCallMonte = Trades.wrap (OptionCallMonteCarlo <| OptionCallMonteCarloRecord.Random(model.configuration))
         let newTrades = Map.add newOptionCallMonte.id newOptionCallMonte model.trades
+        { model with trades = newTrades}, Cmd.none
+    | AddOptionPut ->
+        let newOptionPut = Trades.wrap (OptionPut <| OptionPutRecord.Random(model.configuration))
+        let newTrades = Map.add newOptionPut.id newOptionPut model.trades
+        { model with trades = newTrades}, Cmd.none
+    | AddOptionPutMonte ->
+        let newOptionPutMonte = Trades.wrap (OptionPutMonteCarlo <| OptionPutMonteCarloRecord.Random(model.configuration))
+        let newTrades = Map.add newOptionPutMonte.id newOptionPutMonte model.trades
         { model with trades = newTrades}, Cmd.none
     | RemoveTrade(tradeId) ->
         let newTrades = Map.remove tradeId model.trades
