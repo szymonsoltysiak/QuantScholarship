@@ -74,6 +74,7 @@ type OptionCallRecord =
         InterestRate : float
         Volatility   : float
         Value        : Money option
+        Delta        : float option
     }
     (* Simple utility method for creating a random option call *)
     static member sysRandom = System.Random()
@@ -84,9 +85,10 @@ type OptionCallRecord =
             StockPrice = price
             StrikePrice = System.Math.Round(price*1.1,2)
             Expiry = (DateTime.Now.AddMonths (OptionCallRecord.sysRandom.Next(1, 6))).Date
-            Volatility = OptionCallRecord.sysRandom.NextDouble()
-            InterestRate = OptionCallRecord.sysRandom.NextDouble()
+            Volatility = System.Math.Round(OptionCallRecord.sysRandom.NextDouble(),6)
+            InterestRate = System.Math.Round(OptionCallRecord.sysRandom.NextDouble(),6)
             Value = None
+            Delta = None
         }
 
 type OptionCallValuationInputs = 
@@ -117,6 +119,20 @@ type OptionCallValuationModel(inputs: OptionCallValuationInputs) =
 
         { Value = callPrice; Currency = currency}
 
+    member this.CalculateDelta(): float =
+        let S=inputs.Trade.StockPrice
+        let K=inputs.Trade.StrikePrice
+        let T=inputs.Trade.Expiry.Subtract(DateTime.Now).TotalDays/365.
+        let r=inputs.Trade.InterestRate
+        let sigma=inputs.Trade.Volatility
+        let gaussianCDF (x: float) =
+            Normal.CDF(0.0, 1.0, x)
+
+        let d1 = (log(S / K) + (r + sigma * sigma / 2.0) * T) / (sigma * sqrt(T))
+        let Delta = gaussianCDF(d1)
+        Delta
+
+
 type OptionCallMonteCarloRecord =
     {
         TradeName    : string
@@ -135,8 +151,8 @@ type OptionCallMonteCarloRecord =
             StockPrice = price
             StrikePrice = System.Math.Round(price*1.1,2)
             Expiry = (DateTime.Now.AddMonths (OptionCallRecord.sysRandom.Next(1, 6))).Date
-            Volatility = OptionCallRecord.sysRandom.NextDouble()
-            InterestRate = OptionCallRecord.sysRandom.NextDouble()
+            Volatility = System.Math.Round(OptionCallRecord.sysRandom.NextDouble(),6)
+            InterestRate = System.Math.Round(OptionCallRecord.sysRandom.NextDouble(),6)
             Value = None
         }
 

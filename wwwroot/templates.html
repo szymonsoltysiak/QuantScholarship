@@ -31,7 +31,7 @@
     </tbody>
     </table>
 
-    <h1 class="title">Option Call</h1>
+    <h1 class="title">Option Call (Analytic)</h1>
     <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionCall}">Add New Option Call</button>
     <table class="rz-grid-table">
         <tbody>
@@ -43,25 +43,27 @@
                 <th style="width: 12%;">Expiry</th>
                 <th style="width: 9%;">Interest Rate</th>
                 <th style="width: 9%;">Volatility</th>
-                <th style="width: 19%;">Value</th>
+                <th style="width: 13%;">Value</th>
+                <th style="width: 13%;">Delta</th>
             </tr>
             <template id="OptionCallRow">
             <tr>
                 <td><button class="rz-button rz-ripple rz-border-radius-1" 
                             onclick="${Delete}">X</button></td>
                 <td><input bind-onchange="${Name}"/></td>
-                <td><input bind-onchange="${StockPrice}"  style="width: 85%;"/></td>
-                <td><input bind-onchange="${StrikePrice}"  style="width: 85%;"/></td>
+                <td><input bind-onchange="${StockPrice}"  style="width: 70%;"/></td>
+                <td><input bind-onchange="${StrikePrice}"  style="width: 70%;"/></td>
                 <td><input bind-onchange="${Expiry}" /></td>
                 <td><input bind-onchange="${InterestRate}" style="width: 80%;"/></td>
-                <td><input bind-onchange="${Volatility}"  style="width: 80%;"/></td>
+                <td><input bind-onchange="${Volatility}"  style="width: 95%;"/></td>
                 <td>${Value}</td>
+                <td>${Delta}</td>
             </tr>
             </template> ${OptionCallRows}
         </tbody>
     </table>
 
-    <h1 class="title">Option Call Monte Carlo</h1>
+    <h1 class="title">Option Call (Monte Carlo)</h1>
     <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionCallMonte}">Add New Option Call</button>
     <table class="rz-grid-table">
         <tbody>
@@ -80,8 +82,8 @@
                 <td><button class="rz-button rz-ripple rz-border-radius-1" 
                             onclick="${Delete}">X</button></td>
                 <td><input bind-onchange="${Name}" /></td>
-                <td><input bind-onchange="${StockPrice}"  style="width: 85%;"/></td>
-                <td><input bind-onchange="${StrikePrice}"  style="width: 85%;"/></td>
+                <td><input bind-onchange="${StockPrice}"  style="width: 70%;"/></td>
+                <td><input bind-onchange="${StrikePrice}"  style="width: 70%;"/></td>
                 <td><input bind-onchange="${Expiry}" /></td>
                 <td><input bind-onchange="${InterestRate}" style="width: 80%;"/></td>
                 <td><input bind-onchange="${Volatility}"  style="width: 80%;"/></td>

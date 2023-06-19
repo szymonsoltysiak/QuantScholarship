@@ -93,7 +93,8 @@ let paymentRow dispatch (tradeId, p : PaymentRecord) =
         .Elt()
 
 let optionCallRow dispatch (tradeId, p : OptionCallRecord) =
-    let value = p.Value |> Option.map (string) |> Option.defaultValue "" 
+    let value = p.Value |> Option.map (string) |> Option.defaultValue ""
+    let delta = p.Delta |> Option.map (string) |> Option.defaultValue ""
     let tradeChange msg s = dispatch <| TradeChange (msg (tradeId,s))
     Templates.OptionCallRow()
         .Name(p.TradeName,tradeChange NewName)
@@ -103,6 +104,7 @@ let optionCallRow dispatch (tradeId, p : OptionCallRecord) =
         .InterestRate(sprintf "%A" p.InterestRate, tradeChange NewIntrestRate)
         .Volatility(sprintf "%A" p.Volatility, tradeChange NewVolatility)
         .Value(value)
+        .Delta(delta)
         .Delete(fun e -> dispatch (RemoveTrade tradeId))
         .Elt()
 
