@@ -67,9 +67,7 @@ let summary (model: Model) dispatch =
             match x.trade with
             | Payment p -> p.Value
             | OptionCall p -> p.Value
-            | OptionCallMonteCarlo p -> p.Value
             | OptionPut p -> p.Value
-            | OptionPutMonteCarlo p -> p.Value
             )
         |> Seq.groupBy (fun m -> m.Currency)
     let summaryRow (ccy,values : Money seq) =
@@ -94,8 +92,9 @@ let paymentRow dispatch (tradeId, p : PaymentRecord) =
         .Delete(fun e -> dispatch (RemoveTrade tradeId))
         .Elt()
 
-let optionCallRow dispatch (tradeId, p : OptionCallRecord) =
+let optionRow dispatch (tradeId, p : OptionRecord) =
     let value = p.Value |> Option.map (string) |> Option.defaultValue ""
+    let valueMC = p.ValueMC |> Option.map (string) |> Option.defaultValue ""
     let delta = p.Delta |> Option.map (string) |> Option.defaultValue ""
     let tradeChange msg s = dispatch <| TradeChange (msg (tradeId,s))
     Templates.OptionCallRow()
@@ -106,51 +105,8 @@ let optionCallRow dispatch (tradeId, p : OptionCallRecord) =
         .InterestRate(sprintf "%A" p.InterestRate, tradeChange NewIntrestRate)
         .Volatility(sprintf "%A" p.Volatility, tradeChange NewVolatility)
         .Value(value)
+        .ValueMC(valueMC)
         .Delta(delta)
-        .Delete(fun e -> dispatch (RemoveTrade tradeId))
-        .Elt()
-
-let optionCallRowMonte dispatch (tradeId, p : OptionCallMonteCarloRecord) =
-    let value = p.Value |> Option.map (string) |> Option.defaultValue "" 
-    let tradeChange msg s = dispatch <| TradeChange (msg (tradeId,s))
-    Templates.OptionCallMonteCarloRow()
-        .Name(p.TradeName,tradeChange NewName)
-        .StockPrice(sprintf "%A" p.StockPrice, tradeChange NewStockPrice)
-        .StrikePrice(sprintf "%A" p.StrikePrice, tradeChange NewStrikePrice)
-        .Expiry(sprintf "%A" p.Expiry, tradeChange NewExpiry)
-        .InterestRate(sprintf "%A" p.InterestRate, tradeChange NewIntrestRate)
-        .Volatility(sprintf "%A" p.Volatility, tradeChange NewVolatility)
-        .Value(value)
-        .Delete(fun e -> dispatch (RemoveTrade tradeId))
-        .Elt()
-
-let optionPutRow dispatch (tradeId, p : OptionPutRecord) =
-    let value = p.Value |> Option.map (string) |> Option.defaultValue ""
-    let delta = p.Delta |> Option.map (string) |> Option.defaultValue ""
-    let tradeChange msg s = dispatch <| TradeChange (msg (tradeId,s))
-    Templates.OptionPutRow()
-        .Name(p.TradeName,tradeChange NewName)
-        .StockPrice(sprintf "%A" p.StockPrice, tradeChange NewStockPrice)
-        .StrikePrice(sprintf "%A" p.StrikePrice, tradeChange NewStrikePrice)
-        .Expiry(sprintf "%A" p.Expiry, tradeChange NewExpiry)
-        .InterestRate(sprintf "%A" p.InterestRate, tradeChange NewIntrestRate)
-        .Volatility(sprintf "%A" p.Volatility, tradeChange NewVolatility)
-        .Value(value)
-        .Delta(delta)
-        .Delete(fun e -> dispatch (RemoveTrade tradeId))
-        .Elt()
-
-let optionPutRowMonte dispatch (tradeId, p : OptionPutMonteCarloRecord) =
-    let value = p.Value |> Option.map (string) |> Option.defaultValue "" 
-    let tradeChange msg s = dispatch <| TradeChange (msg (tradeId,s))
-    Templates.OptionPutMonteCarloRow()
-        .Name(p.TradeName,tradeChange NewName)
-        .StockPrice(sprintf "%A" p.StockPrice, tradeChange NewStockPrice)
-        .StrikePrice(sprintf "%A" p.StrikePrice, tradeChange NewStrikePrice)
-        .Expiry(sprintf "%A" p.Expiry, tradeChange NewExpiry)
-        .InterestRate(sprintf "%A" p.InterestRate, tradeChange NewIntrestRate)
-        .Volatility(sprintf "%A" p.Volatility, tradeChange NewVolatility)
-        .Value(value)
         .Delete(fun e -> dispatch (RemoveTrade tradeId))
         .Elt()
 
@@ -159,22 +115,16 @@ let homePage (model: Model) dispatch =
 
     let payments = onlyPayments model.trades
     let calls = onlyCalls model.trades
-    let callMonte = onlyCallsMonteCarlo model.trades
     let puts = onlyPuts model.trades
-    let putMonte = onlyPutsMonteCarlo model.trades
     let trades = 
         Templates.Trades()
             .AddPayment(fun _ -> dispatch AddPayment)
             .AddOptionCall(fun _ -> dispatch AddOptionCall)
-            .AddOptionCallMonte(fun _ -> dispatch AddOptionCallMonte)
             .AddOptionPut(fun _ -> dispatch AddOptionPut)
-            .AddOptionPutMonte(fun _ -> dispatch AddOptionPutMonte)
             .RecalculateAll(fun _ -> dispatch RecalculateAll)
             .PaymentRows(forEach payments (paymentRow dispatch))
-            .OptionCallRows(forEach calls (optionCallRow dispatch))
-            .OptionCallMonteCarloRows(forEach callMonte (optionCallRowMonte dispatch))
-            .OptionPutRows(forEach puts (optionPutRow dispatch))
-            .OptionPutMonteCarloRows(forEach putMonte (optionPutRowMonte dispatch))
+            .OptionCallRows(forEach calls (optionRow dispatch))
+            .OptionPutRows(forEach puts (optionRow dispatch))
             .Elt()
 
     Templates.Home()

@@ -31,7 +31,7 @@
     </tbody>
     </table>
 
-    <h1 class="title">Option Call (Analytic)</h1>
+    <h1 class="title">Option Call</h1>
     <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionCall}">Add New Option Call</button>
     <table class="rz-grid-table">
         <tbody>
@@ -43,7 +43,8 @@
                 <th style="width: 12%;">Expiry</th>
                 <th style="width: 9%;">Interest Rate</th>
                 <th style="width: 9%;">Volatility</th>
-                <th style="width: 13%;">Value</th>
+                <th style="width: 13%;">Value (BS)</th>
+                <th style="width: 13%;">Value (MC)</th>
                 <th style="width: 13%;">Delta</th>
             </tr>
             <template id="OptionCallRow">
@@ -57,43 +58,14 @@
                 <td><input bind-onchange="${InterestRate}" style="width: 80%;"/></td>
                 <td><input bind-onchange="${Volatility}"  style="width: 95%;"/></td>
                 <td>${Value}</td>
+                <td>${ValueMC}</td>
                 <td>${Delta}</td>
             </tr>
             </template> ${OptionCallRows}
         </tbody>
     </table>
 
-    <h1 class="title">Option Call (Monte Carlo)</h1>
-    <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionCallMonte}">Add New Option Call</button>
-    <table class="rz-grid-table">
-        <tbody>
-            <tr>
-                <th></th>
-                <th style="width: 16%;">Name</th>
-                <th style="width: 16%;">Stock Price</th>
-                <th style="width: 12%;">Strike Price</th>
-                <th style="width: 12%;">Expiry</th>
-                <th style="width: 9%;">Interest Rate</th>
-                <th style="width: 9%;">Volatility</th>
-                <th style="width: 19%;">Value</th>
-            </tr>
-            <template id="OptionCallMonteCarloRow">
-            <tr>
-                <td><button class="rz-button rz-ripple rz-border-radius-1" 
-                            onclick="${Delete}">X</button></td>
-                <td><input bind-onchange="${Name}" /></td>
-                <td><input bind-onchange="${StockPrice}"  style="width: 70%;"/></td>
-                <td><input bind-onchange="${StrikePrice}"  style="width: 70%;"/></td>
-                <td><input bind-onchange="${Expiry}" /></td>
-                <td><input bind-onchange="${InterestRate}" style="width: 80%;"/></td>
-                <td><input bind-onchange="${Volatility}"  style="width: 80%;"/></td>
-                <td>${Value}</td>
-            </tr>
-            </template> ${OptionCallMonteCarloRows}
-        </tbody>
-    </table>
-
-    <h1 class="title">Option Put (Analytic)</h1>
+    <h1 class="title">Option Put</h1>
     <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionPut}">Add New Option Put</button>
     <table class="rz-grid-table">
         <tbody>
@@ -105,7 +77,8 @@
                 <th style="width: 12%;">Expiry</th>
                 <th style="width: 9%;">Interest Rate</th>
                 <th style="width: 9%;">Volatility</th>
-                <th style="width: 13%;">Value</th>
+                <th style="width: 13%;">Value (BS)</th>
+                <th style="width: 13%;">Value (MC)</th>
                 <th style="width: 13%;">Delta</th>
             </tr>
             <template id="OptionPutRow">
@@ -119,45 +92,15 @@
                 <td><input bind-onchange="${InterestRate}" style="width: 80%;"/></td>
                 <td><input bind-onchange="${Volatility}"  style="width: 95%;"/></td>
                 <td>${Value}</td>
+                <td>${ValueMC}</td>
                 <td>${Delta}</td>
             </tr>
             </template> ${OptionPutRows}
         </tbody>
     </table>
+    </template>
 
-    <h1 class="title">Option Put (Monte Carlo)</h1>
-    <button class="rz-button rz-secondary rz-ripple rz-border-radius-1" onclick="${AddOptionPutMonte}">Add New Option Put</button>
-    <table class="rz-grid-table">
-        <tbody>
-            <tr>
-                <th></th>
-                <th style="width: 16%;">Name</th>
-                <th style="width: 16%;">Stock Price</th>
-                <th style="width: 12%;">Strike Price</th>
-                <th style="width: 12%;">Expiry</th>
-                <th style="width: 9%;">Interest Rate</th>
-                <th style="width: 9%;">Volatility</th>
-                <th style="width: 19%;">Value</th>
-            </tr>
-            <template id="OptionPutMonteCarloRow">
-            <tr>
-                <td><button class="rz-button rz-ripple rz-border-radius-1" 
-                            onclick="${Delete}">X</button></td>
-                <td><input bind-onchange="${Name}" /></td>
-                <td><input bind-onchange="${StockPrice}"  style="width: 70%;"/></td>
-                <td><input bind-onchange="${StrikePrice}"  style="width: 70%;"/></td>
-                <td><input bind-onchange="${Expiry}" /></td>
-                <td><input bind-onchange="${InterestRate}" style="width: 80%;"/></td>
-                <td><input bind-onchange="${Volatility}"  style="width: 80%;"/></td>
-                <td>${Value}</td>
-            </tr>
-            </template> ${OptionPutMonteCarloRows}
-        </tbody>
-    </table>
-</div>
-</template>
-
-<template id="Summary">
+    <template id="Summary">
     <div class="content">
       <h1 class="title">Summary</h1>
       <table class="rz-grid-table">
@@ -173,8 +116,8 @@
               <td>${Value}</td>
             </tr>
           </template>
-</tbody>
-</table>
+    </tbody>
+    </table>
 </div>
 </template>
 

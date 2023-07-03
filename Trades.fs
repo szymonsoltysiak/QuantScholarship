@@ -3,10 +3,8 @@ open Payment
 
 type Trade = 
     | Payment of PaymentRecord 
-    | OptionCall of OptionCallRecord
-    | OptionCallMonteCarlo of OptionCallMonteCarloRecord
-    | OptionPut of OptionPutRecord
-    | OptionPutMonteCarlo of OptionPutMonteCarloRecord
+    | OptionCall of OptionRecord
+    | OptionPut of OptionRecord
 
 type TradeID = System.Guid
 
